@@ -1,4 +1,5 @@
 library(shiny)
+library(DT)
 source("include.R")
 
 shinyServer(function(input, output) {
@@ -37,15 +38,24 @@ shinyServer(function(input, output) {
   xrefreshit <- eventReactive(input$refreshit,{
     return(list_tables(s,input$selected_caslib))
   })
-   
-  output$mytable1 = renderDataTable({
-   xrefreshit()
-  })
-  
-  output$table_radio <- renderUI({
-    options = as.vector(table_names())
-    radioButtons("selected_table", "Table Deletion",options,selected=character(0))
-  })
 
+  #output$mytable1 = renderDataTable({
+  # xrefreshit()
+  #})
+  output$x1 = DT::renderDataTable(xrefreshit(), server = FALSE)
   
+  #output$table_radio <- renderUI({
+  #  options = as.vector(table_names())
+  #  radioButtons("selected_table", "Table Deletion",options,selected=character(0))
+  #})
+
+  xdroptable <- eventReactive(input$unloadit,{
+    for(tname in table_names()[input$x1_rows_selected]){
+      cas.table.dropTable(s,name=tname)
+    }
+   print(table_names()[input$x1_rows_selected])
+  })  
+  output$text2 <- renderPrint({
+    xdroptable()
+  })
 })

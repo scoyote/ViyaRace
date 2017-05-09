@@ -14,8 +14,13 @@ shinyUI(fluidPage(
   ),
   mainPanel(
     actionButton("refreshit","Refresh"),
-    dataTableOutput("mytable1"),
-    uiOutput("table_radio")
+  #  dataTableOutput("mytable1"),
+    fluidRow(
+      column(12, DT::dataTableOutput('x1'))
+    )
+    #uiOutput("table_radio")
+    ,actionButton("unloadit","Unload"),
+  verbatimTextOutput("text2")
   )
 )
 )
