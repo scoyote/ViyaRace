@@ -8,7 +8,11 @@ shinyUI(fluidPage(
     verbatimTextOutput("text")
   ),
   mainPanel(
-    actionButton("rx","rx"),
+    fluidRow(
+      column(12, DT::dataTableOutput('f1'))
+    ),
+    actionButton("multiload","Load Datasets into CAS"),
+    
     fluidRow(
       column(12, DT::dataTableOutput('x1'))
     ),

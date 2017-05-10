@@ -3,8 +3,6 @@
 
 shinyServer(function(input, output) {
 
-  tabs <- NULL
-
   file_names <- reactive({
     files <- tryCatch({
       return(unnest(data.frame(cas.table.fileInfo(s,caslib=input$selected_caslib)))[,4])
@@ -27,8 +25,6 @@ shinyServer(function(input, output) {
   })
 
   writeDTx <- function(sess,caslb,colx=c(1,8,11,12,16,17)){
-    #tabs <- unnest(data.frame(cas.table.tableInfo(sess,caslib=caslb)))
-    #names(tabs) <- sub("TableInfo.", "", names(tabs))
     tryCatch({
       tables <- unnest(data.frame(cas.table.tableInfo(s,caslib=input$selected_caslib)))
       names(tables) <- sub("TableInfo.", "", names(tables))
@@ -36,18 +32,27 @@ shinyServer(function(input, output) {
     },
     error = function(err){ return(NULL)}
     )
-    
+  }
+  writeFLx <- function(sess,caslb,colx=c(4,6,7)){
+    tryCatch({
+      files <- unnest(data.frame(cas.table.fileInfo(s,caslib=input$selected_caslib)))
+      output$f1 <-DT::renderDataTable(files[,colx], server = FALSE)
+    },
+    error = function(err){ return(NULL)}
+    )
   }
   
 # Populate the  active CASLIBs
   output$caslib_radio <- renderUI({
     available_caslibs = as.vector(caslib_names())
     radioButtons("selected_caslib", "Available CASLIBs",available_caslibs,selected="DemoData")
+
   })
   
   observeEvent(input$selected_caslib ,{
     cas.sessionProp.setSessOpt(s,caslib=input$selected_caslib)
     writeDTx(s,input$selected_caslib)
+    writeFLx(s,input$selected_caslib)
   })
  
   output$file_dropdown <- renderUI({
@@ -69,6 +74,14 @@ shinyServer(function(input, output) {
     xloadtable()
   })
   
+  observeEvent(input$multiload,{
+    clib <- input$selected_caslib
+    fn <- unnest(data.frame(cas.table.fileInfo(s,caslib=clib)))
+    for(fname in fn[input$f1_rows_selected,4]){
+      cas.table.loadTable(s,path=fname,caslib=clib) 
+    }
+    writeDTx(s,input$selected_caslib)
+  })  
   
   observeEvent(input$unloadit,{
     clib <- input$selected_caslib
