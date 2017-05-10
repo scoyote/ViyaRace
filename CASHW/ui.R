@@ -3,7 +3,6 @@ shinyUI(fluidPage(
   headerPanel('Examples of DataTables'),
   sidebarPanel(
     uiOutput("caslib_radio"),
- 
     uiOutput("file_dropdown"),
     actionButton("loaddf", "Load"),
     verbatimTextOutput("text")
@@ -15,7 +14,9 @@ shinyUI(fluidPage(
     ),
     verbatimTextOutput("logdata"),
     actionButton("unloadit","Unload"),
-  verbatimTextOutput("text2")
+    actionButton("promoteit","Promote"),
+  verbatimTextOutput("text2"),
+  verbatimTextOutput("text3")
   )
 )
 )

@@ -25,20 +25,19 @@ shinyServer(function(input, output) {
     error = function(err){ return(NULL)}
     )
   })
-  
-  reftab <- reactive({
-    output$x1 <- DT::renderDataTable({tryCatch({
+
+  writeDTx <- function(sess,caslb,colx=c(1,8,11,12,16,17)){
+    #tabs <- unnest(data.frame(cas.table.tableInfo(sess,caslib=caslb)))
+    #names(tabs) <- sub("TableInfo.", "", names(tabs))
+    tryCatch({
       tables <- unnest(data.frame(cas.table.tableInfo(s,caslib=input$selected_caslib)))
       names(tables) <- sub("TableInfo.", "", names(tables))
-      return(tables)
+      output$x1 <-DT::renderDataTable(tables[,colx], server = FALSE)
     },
     error = function(err){ return(NULL)}
     )
-    }, server = FALSE)
-  })
-
-  
-  
+    
+  }
   
 # Populate the  active CASLIBs
   output$caslib_radio <- renderUI({
@@ -48,13 +47,12 @@ shinyServer(function(input, output) {
   
   observeEvent(input$selected_caslib ,{
     cas.sessionProp.setSessOpt(s,caslib=input$selected_caslib)
-    output$x1 <- DT::renderDataTable(table_names(), server = FALSE)
+    writeDTx(s,input$selected_caslib)
   })
  
   output$file_dropdown <- renderUI({
     selectInput("selected_file","Select your choice",choices = as.vector(file_names()))
   })
-  
   
   
 
@@ -63,8 +61,8 @@ shinyServer(function(input, output) {
     #log <- capture.output(cas.table.loadTable(s,path=input$selected_file),type="message")
     #paste(log,sep=" ")
     cas.table.loadTable(s,path=input$selected_file,caslib=input$selected_caslib)
-    tabs <- unnest(data.frame(cas.table.tableInfo(s,caslib=input$selected_caslib)))
-    output$x1 <- DT::renderDataTable(tabs, server = FALSE)
+    
+    writeDTx(s,input$selected_caslib)
   })
   
   output$text <- renderPrint({
@@ -72,19 +70,26 @@ shinyServer(function(input, output) {
   })
   
   
-  xdroptable <- eventReactive(input$unloadit,{
+  observeEvent(input$unloadit,{
     clib <- input$selected_caslib
     tn <- unnest(data.frame(cas.table.tableInfo(s,caslib=clib)))
     for(tname in tn[input$x1_rows_selected,1]){
-      cas.table.dropTable(s,name=tname)
+      cas.table.dropTable(s,name=tname) 
     }
-   print(paste("Unloading ",tn[input$x1_rows_selected,1],sep=""))    
+    print(paste("Unloading ",tn[input$x1_rows_selected,1],sep=""))
    
-   tabs <- unnest(data.frame(cas.table.tableInfo(s,caslib=clib)))
-   output$x1 <- DT::renderDataTable(tabs, server = FALSE)
+    writeDTx(s,input$selected_caslib)
    })  
+
   
-  output$text2 <- renderPrint({
-    xdroptable()
-  })
+  observeEvent(input$promoteit,{
+    clib <- input$selected_caslib
+    tn <- unnest(data.frame(cas.table.tableInfo(s,caslib=clib)))
+    for(tname in tn[input$x1_rows_selected,1]){
+      cas.table.promote(s,name=tname,caslib=clib) 
+    }
+    print(paste("Promoting ",tn[input$x1_rows_selected,1],sep=""))
+    writeDTx(s,input$selected_caslib)
+  }) 
+
 })
