@@ -1,7 +1,11 @@
 
 shinyUI(fluidPage(
-  headerPanel('Examples of DataTables'),
+  headerPanel('Examples of CAS Functions'),
   sidebarPanel(
+   # textInput("sessionid","Enter Existing Session",value=NULL),
+   # actionButton("connectit","Connect to Server"),
+    textOutput("sessionText"),
+    textOutput("userText"),
     uiOutput("caslib_radio"),
     uiOutput("file_dropdown"),
     actionButton("loaddf", "Load"),

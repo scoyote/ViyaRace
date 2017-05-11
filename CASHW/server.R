@@ -1,5 +1,7 @@
+library(shiny)
+library(swat)
 
-#source("include.R")
+
 
 shinyServer(function(input, output) {
 
@@ -42,6 +44,18 @@ shinyServer(function(input, output) {
     )
   }
   
+#  xconnectit <- eventReactive(input$connectit,{
+#    tryCatch({
+#      return(CAS('localhost', 5570, authfile='~./authinfo',session=input$sessionid))
+#    },
+#    error = function(err){ return("error")}
+#    )
+#  })
+  
+  output$sessionText <- renderPrint({print(paste("Session:",s$session,sep=""),row.names = FALSE)})
+  output$userText <- renderPrint({print(paste("Username:",s$username,sep=""),row.names = FALSE)})
+  
+  
 # Populate the  active CASLIBs
   output$caslib_radio <- renderUI({
     available_caslibs = as.vector(caslib_names())
@@ -58,9 +72,6 @@ shinyServer(function(input, output) {
   output$file_dropdown <- renderUI({
     selectInput("selected_file","Select your choice",choices = as.vector(file_names()))
   })
-  
-  
-
   
   xloadtable <- eventReactive(input$loaddf,{
     #log <- capture.output(cas.table.loadTable(s,path=input$selected_file),type="message")
