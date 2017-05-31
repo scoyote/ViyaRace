@@ -2,4 +2,8 @@
 *.zip
 *.dat
 .Rproj.user
+<<<<<<< HEAD
 .gitignore
+=======
+*.gitignore
+>>>>>>> 68cdb7302c36361f008fa0102f3657cb2d444d7e
