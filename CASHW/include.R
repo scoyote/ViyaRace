@@ -1,6 +1,7 @@
 library(swat)
 library(tidyr)
 
+s <- CAS('localhost', 5570, authfile='~./authinfo')
 
 #files <- reactiveValues()
 #list_files <- function(sessionID,caslibID){
